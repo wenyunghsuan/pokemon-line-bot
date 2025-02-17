@@ -32,37 +32,13 @@ def callback():
     return 'OK'
 
 @handler.add(MessageEvent, message=TextMessage)
+
 def handle_message(event):
-    print("Received message:", event.message.text)  # 添加日誌檢查
-    user_message = event.message.text
-    
-    try:
-        # 準備輸入
-        inputs = tokenizer(user_message, return_tensors="pt", max_length=50, truncation=True)
-        
-        # 生成回應
-        with torch.no_grad():
-            outputs = model.generate(
-                inputs["input_ids"],
-                max_length=100,
-                num_return_sequences=1,
-                no_repeat_ngram_size=2,
-                temperature=0.7
-            )
-        
-        response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        
-        # 發送回應
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=response)
-        )
-    except Exception as e:
-        print("Error:", e)  # 打印錯誤訊息
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text="抱歉，我現在無法正確處理您的請求。")
-        )
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text="收到你的訊息！")  # 使用靜態回應來測試
+    )
+
 
 if __name__ == "__main__":
     app.run(port=5000)
