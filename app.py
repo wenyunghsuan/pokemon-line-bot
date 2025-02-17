@@ -33,6 +33,7 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    print("Received message:", event.message.text)  # 添加日誌檢查
     user_message = event.message.text
     
     try:
@@ -57,6 +58,7 @@ def handle_message(event):
             TextSendMessage(text=response)
         )
     except Exception as e:
+        print("Error:", e)  # 打印錯誤訊息
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text="抱歉，我現在無法正確處理您的請求。")
