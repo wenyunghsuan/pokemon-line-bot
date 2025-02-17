@@ -34,7 +34,7 @@ def handle_message(event):
     
     try:
         # 準備輸入
-        inputs = tokenizer(user_message, return_tensors="pt", max_length=100, truncation=True)
+        inputs = tokenizer(user_message, return_tensors="pt", max_length=50, truncation=True)
         
         # 生成回應
         with torch.no_grad():
