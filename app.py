@@ -20,7 +20,10 @@ model = AutoModelForCausalLM.from_pretrained(model_name)
 def callback():
     signature = request.headers['X-Line-Signature']
     body = request.get_data(as_text=True)
-    
+
+    print("Request body:", body)
+    print("Signature:", signature)
+
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
