@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
@@ -5,32 +6,37 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 app = Flask(__name__)
 
-# 設定 LINE Bot 驗證
-line_bot_api = LineBotApi('LINE_CHANNEL_ACCESS_TOKEN')  # 請替換為你的 Channel Access Token
-handler = WebhookHandler('LINE_CHANNEL_SECRET')  # 請替換為你的 Channel Secret
+# 取得環境變數
+CHANNEL_SECRET = os.getenv('LINE_CHANNEL_SECRET')
+CHANNEL_ACCESS_TOKEN = os.getenv('LINE_CHANNEL_ACCESS_TOKEN')
+
+# 初始化 LINE Bot API
+line_bot_api = LineBotApi(CHANNEL_ACCESS_TOKEN)
+handler = WebhookHandler(CHANNEL_SECRET)
 
 @app.route("/callback", methods=['POST'])
 def callback():
+    # 確保請求簽名正確
     signature = request.headers['X-Line-Signature']
+
+    # 取得請求的 body
     body = request.get_data(as_text=True)
 
-    print("Request body:", body)  # 輸出訊息正文
-    print("Signature:", signature)  # 輸出簽名
-
     try:
-        handler.handle(body, signature)  # 處理訊息
+        handler.handle(body, signature)
     except InvalidSignatureError:
-        abort(400)  # 如果簽名錯誤，返回 400 錯誤
-    
+        abort(400)
+
     return 'OK'
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    # 當接收到訊息時，發送回應
+    # 當接收到文本訊息時，回應相同的內容
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text="收到你的訊息！")  # 使用靜態回應來測試
+        TextSendMessage(text=event.message.text)
     )
 
+# 這個用來執行應用，通常不需要手動啟動這個部分
 if __name__ == "__main__":
-    app.run(port=5000)
+    app.run(debug=True)
